@@ -9,8 +9,8 @@ class DudeInfiniteSlider {
             document.querySelector(slider).children;
         this.sliderItems = [...this.sliderChildren];
         this.sliderBodyWidth = null;
-        this.sliderItemsWidth = this.sliderItems[0].offsetWidth;
-        this.sliderItemsHeight = this.sliderItems[0].offsetHeight;
+        this.sliderItemsWidth = null;
+        this.sliderItemsHeight = null;
         this.options = options;
         this.numOfScreens = this.sliderItems.length;
         this.currentScreen = 0;
@@ -21,12 +21,19 @@ class DudeInfiniteSlider {
         this.animTime = this.options.animTime;
     }
 
-    defaultStyles() { 
+    calcSize() {
+        this.sliderBodyWidth = this.slider.offsetWidth;
+        this.sliderItemsWidth = this.sliderItems[0].offsetWidth;
+        this.sliderItemsHeight = this.sliderItems[0].offsetHeight;
         this.slider.style.width = `${this.sliderItemsWidth}px`;
         this.slider.style.height = `${this.sliderItemsHeight}px`;
+    }
+
+    defaultStyles() { 
+        // this.slider.style.width = `${this.sliderItemsWidth}px`;
+        // this.slider.style.height = `${this.sliderItemsHeight}px`;
         this.slider.style.position = 'relative';
         this.slider.style.overflow = 'hidden';
-        this.sliderBodyWidth = this.slider.offsetWidth;
 
         this.sliderItems.forEach(item => {
             item.style.position = 'absolute';
@@ -73,6 +80,8 @@ class DudeInfiniteSlider {
     }
 
     start() {
+        this.resize();
+        this.calcSize();
         this.defaultStyles();
         this.defaultValues();
 
@@ -87,6 +96,18 @@ class DudeInfiniteSlider {
         this.arrowLeftClick();
 
         this.autoScroll();
+    }
+
+    resize() {
+        window.addEventListener('resize', () => {
+            this.calcSize();
+            this.currentScreen = 0;
+            this.sortPositioning(
+                this.sliderItems[this.currentScreen],
+                this.sliderItems[this.currentScreen - 1],
+                this.sliderItems[this.currentScreen + 1]
+            );
+        });
     }
 
     autoScroll() {
